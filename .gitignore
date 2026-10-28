@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+runs/
+backend/evals/results/*
+!backend/evals/results/20261026-214803.md
+!backend/evals/results/20261026-214803-judge.md
+node_modules/
+.next/
+.ruff_cache/
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+frontend/AGENTS.md
