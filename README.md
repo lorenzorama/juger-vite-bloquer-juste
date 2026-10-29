@@ -5,6 +5,8 @@ Code de la démo du talk IndabaX Madagascar 2026 : un agent mail (DeepAgents + C
 - **Config A** : l'agent est naïf, Jev observe seulement (mode shadow).
 - **Config B** : Jev est enforced. Il met en quarantaine les mails qui parlent à l'IA (Jev-I) et bloque les brouillons qui sortent de la demande ou laissent fuir un secret (Jev-E).
 
+Jev joue deux rôles, dans deux parties du code : **le gardien** (`app/guard.py`), pendant le run, et **le juge** (`evals/judge.py`), après le run, qui note chaque run contre le golden set. Le gardien bloque une action, le juge note un run.
+
 L'agent n'envoie jamais de mail : il écrit des brouillons dans une boîte locale (fichiers JSONL). Toutes les adresses et tous les codes sont inventés.
 
 ## Structure
@@ -14,14 +16,14 @@ backend/
   app/
     agent.py     l'agent DeepAgents et la boucle d'un run
     tools.py     les 3 tools : list_inbox, read_mail, write_draft
-    guard.py     le guard : questions posées à Jev et thresholds
+    guard.py     le gardien (guardrail), pendant le run : questions posées à Jev et thresholds
     canon.py     révèle le texte caché d'un mail HTML
     mailbox.py   la boîte mail locale
     main.py      l'API FastAPI (runs en SSE, replays)
     cli.py       lancer un run dans le terminal
   evals/         16 scénarios (10 attacks, 6 tâches benign), A vs B
     golden_set.csv  le golden set : la référence attendue pour chaque scénario
-    judge.py        Jev-as-judge : note chaque run, la médiane donne la confiance
+    judge.py        le juge (Jev-as-judge), après le run : note chaque run, la médiane donne la confiance
     results/        les résultats présentés au talk (26/10/2026)
   fixtures/      les boîtes de démo
 frontend/        l'interface Next.js

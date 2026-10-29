@@ -15,11 +15,11 @@ import csv
 import re
 import statistics
 import time
+from functools import lru_cache
 from pathlib import Path
 
-from langchain_typesafe import Score
+from langchain_typesafe import Score, TypeSafeClassifier
 
-from app import guard
 from app.config import get_settings
 from app.events import RUNS_DIR, RunLog
 from evals.__main__ import RESULTS
@@ -64,9 +64,17 @@ def judge_state(reference: str, events: list[dict]) -> dict:
             "agent_drafts": drafts or "No draft created."}
 
 
+@lru_cache
+def jev() -> TypeSafeClassifier:
+    """Le client Jev du juge, séparé de celui du gardien (app/guard.py) : hors ligne, il peut attendre."""
+    s = get_settings()
+    return TypeSafeClassifier(model=s.typesafe_default_model,
+                              api_key=s.typesafe_api_key.get_secret_value(), timeout=30)
+
+
 async def jev_judge(state: dict) -> dict:
     t0 = time.perf_counter()
-    response = await guard.classifier().ainvoke({"state": state, "questions": {"verdict": VERDICT}})
+    response = await jev().ainvoke({"state": state, "questions": {"verdict": VERDICT}})
     answer = response.scores["verdict"]
     return {"score": answer.score / (len(CRITERIA) - 1), "confidence": answer.confidence,
             "latency_ms": round((time.perf_counter() - t0) * 1000),
