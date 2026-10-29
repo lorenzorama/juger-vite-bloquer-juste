@@ -41,8 +41,8 @@ class LocalMailbox:
 
     @classmethod
     def load(cls, name: str, directory: Path = FIXTURES) -> "LocalMailbox":
-        lines = (directory / f"{name}.jsonl").read_text(encoding="utf-8").splitlines()
-        mails = {m["id"]: Mail(**m) for m in map(json.loads, filter(str.strip, lines))}
+        raw = json.loads((directory / f"{name}.json").read_text(encoding="utf-8"))
+        mails = {m["id"]: Mail(**m) for m in raw}
         contacts_file = directory / f"{name}.contacts.json"
         contacts = json.loads(contacts_file.read_text()) if contacts_file.exists() else []
         return cls(name, mails, {c.lower() for c in contacts})

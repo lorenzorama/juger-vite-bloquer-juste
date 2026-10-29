@@ -35,7 +35,7 @@ class SaveRequest(BaseModel):
 
 
 def _mailboxes() -> list[str]:
-    return sorted(p.stem for p in FIXTURES.glob("*.jsonl"))
+    return sorted(p.stem for p in FIXTURES.glob("*.json") if not p.name.endswith(".contacts.json"))
 
 
 def _load(mailbox: str) -> LocalMailbox:
